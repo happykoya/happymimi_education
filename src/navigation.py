@@ -19,11 +19,15 @@ from move_base_msgs.msg import MoveBaseAction,MoveBaseGoal #初期状態で使�
 import actionlib  #どの司令に対する結果なのかや、実行中のフィードバックを返すことができる
 from std_srvs.srv import Empty
 
+from voice_common_pkg.srv import TTS
+from voice_common_pkg.srv import SpeechToText
+
 ​
 class Navigation():
 
     def __init__(self):
 
+        self.tts = rospy.ServiceProxy('/tts',TTS)
         self.coord_list = []
         self.sub_message = rospy.Subscriber('/imput_target',String, self.messageCB)
         self.target_name = 'NULL'
@@ -46,7 +50,7 @@ class Navigation():
     def searchLocationName(self):　#設定された目標が正しいか判定
 
         rospy.loginfo("search LocationName")
-        f = open('/home/athome/catkin_ws/src/mimi_common_pkg/config/location_dict.yaml')#mimi_common_pkgから辞書型のデータ配列を呼び出し
+        f = open('/home/athome/catkin_ws/src/mimi_common_pkg/config/kouya.yaml')#mimi_common_pkgから辞書型のデータ配列を呼び出し
         location_dict = load(f)
         f.close()
         print self.target_name
@@ -90,12 +94,16 @@ class Navigation():
 
                 elif navi_state == 3:
                     rospy.loginfo('Navigation success!!')
+
+                    self.tts('Navigation success')
                     return 0
 
                 elif navi_state == 4:
                     if count == 10:
                         count = 0
                         rospy.loginfo('Navigation Failed')
+
+                        self.tts('Navigation Failed')
                         return 0
 
                     else:
@@ -113,10 +121,17 @@ class Navigation():
 
 ​
 def main():
+    rospy.wait_for_service('/tts')
+    #tts = rospy.ServiceProxy('/tts',TTS)
+
     nv = Navigation()
     state = 0
+    print "server is ready"
     rospy.loginfo('start "navigation"')
-    while not rospy.is_shutdown() and not state ==3:
+
+    nv.tts('Start navigation')
+
+    while not rospy.is_shutdown() and not state == 3:
         if state == 0:
             state = nv.input_value()#メッセージを受信するまで待機
 
@@ -128,8 +143,9 @@ def main():
 
     rospy.loginfo('Finish "Navigation"')
 
+    nv.tts('Finish navigation')
+
 ​
     if __name__ == '__main__':
         rospy.init_node('navigaiton_tut')
-        print "Start"
         main()
