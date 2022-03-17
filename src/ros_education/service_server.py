@@ -11,9 +11,8 @@ def handle_service(req):
 def service_server():
     rospy.init_node('service_server')
     s = rospy.Service('call_me', Empty, handle_service)
-    print "Ready to serve."
+    print "Ready to server."
     rospy.spin()
 
 if __name__ == '__main__':
     service_server()
-
