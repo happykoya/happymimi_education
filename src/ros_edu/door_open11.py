@@ -9,6 +9,9 @@
 import rospy
 from sensor_msgs.msg import LaserScan
 from geometry_msgs.msg import Twist
+sys.path.insert(0, '/home/athome/catkin_ws/src/mimi_common_pkg/scripts')
+from common_action_client import *
+from common_function import *
 
 class SubscriberClass():
     def __init__(self):
@@ -27,6 +30,7 @@ class SubscriberClass():
 class PublisherClass():
 
     def __init__(self):
+
         self.pub_message = rospy.Publisher('cmd_vel_mux/input/teleope', Twist,queue_size = 1)
 
     def lineContorol(self, value):
@@ -36,14 +40,23 @@ class PublisherClass():
         self.pub_message.publish(twist_cmd)
 
 def main():
+    rospy.wait_for_service('/tts')
+    #rospy.wait_for_service('/stt_server')
+    print "server is ready"
+    #stt = rospy.ServiceProxy('/stt_server',SpeechToText)
+    tts = rospy.ServiceProxy('/tts',TTS)
+    #recognition = self.stt(short_str = True,context_phrases = ['yes','no','again'],
+            #boost_value = 15.0)
     safety_distance = 2.0
-    rospy.loginfo('start "open door"')
+    speak('start door_open')
+    rospy.loginfo('start "door open"')
     sub = SubscriberClass()
     pub = PublisherClass()
     while not rospy.is_shutdown():
         state = sub.message_value()
         if state >= safety_distance:
             rospy.loginfo('start forward')
+
             pub.lineContorol(0.2)
         else:
             pass

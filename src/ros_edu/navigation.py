@@ -41,6 +41,7 @@ class Navigation():
     def input_value(self): #目標の設定待ち
 
         while not rospy.is_shutdown() and self.target_name == 'NULL':
+
             print "wait for topic…"
             rospy.sleep(2.0)
 
@@ -129,7 +130,6 @@ def main():
     print "server is ready"
     rospy.loginfo('start "navigation"')
 
-    nv.tts('Start navigation')
 
     while not rospy.is_shutdown() and not state == 3:
         if state == 0:
@@ -142,8 +142,6 @@ def main():
             state = nv.navigationAC()#アクションクライアントの実行
 
     rospy.loginfo('Finish "Navigation"')
-
-    nv.tts('Finish navigation')
 
 ​
     if __name__ == '__main__':
